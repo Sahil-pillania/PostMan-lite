@@ -3,7 +3,7 @@ console.log("Connected");
 // variables 
 let addedParamsCount = 0;
 
-// Utility functions 
+// Utility function
 // function to get DOM element from string 
 function getElementFromString(string){
     let div = document.createElement('div');
@@ -51,13 +51,15 @@ addParam.addEventListener('click', ()=> {
     // convert the element string to DOM node 
     let paramElement = getElementFromString(string);
     params.appendChild(paramElement);
+
     // add an event listener to remove params 
     let deleteParam = document.getElementsByClassName('deleteParam');
     for( item of deleteParam){
         item.addEventListener('click', (e)=>{
-            if(confirm("do you want to delete this param")){
-                e.target.parentElement.remove();
-            }
+            // if(confirm("do you want to delete this param")){
+            //     e.target.parentElement.remove();
+            // }
+            e.target.parentElement.remove();
         })
     }
     addedParamsCount ++;
@@ -69,19 +71,22 @@ addParam.addEventListener('click', ()=> {
 // action on submit button 
 let submit = document.getElementById('submit');
 submit.addEventListener('click', ()=>{
-    document.getElementById('responseJsonText').value = "Please wait...Fetching response.";
+    // document.getElementById('responseJsonText').value = "Please wait...Fetching response.";
+    document.getElementById('response-prism').innerHTML = "Please wait...Fetching response.";
 
     let url = document.getElementById('url').value;
     let requestType = document.querySelector("input[name='request']:checked").value;
     let contentType = document.querySelector("input[name='content']:checked").value;
     // console.log(url, requestType, contentType);
 
-    if (contentType == 'parameters'){
+    if(contentType == "parameters"){
         data = {};
-        for (let i = 0; i < addedParamsCount + 1; i++) {
-            if(document.getElementById('parameterkey'+ (i + 1)) != undefined){
-            let key = document.getElementById('parameterkey'+ (i + 1)).value;
+        // console.log(document.getElementById('parameterKey1').value);
+        for (let i = 0; i < addedParamsCount+1; i++) {
+            if(document.getElementById('parameterKey'+(i+1)) != undefined){
+            let key = document.getElementById('parameterKey'+ (i + 1)).value;
             let value = document.getElementById('parameterValue'+ (i + 1)).value;
+            // console.log(key, value);
             data[key] = value;
             }
         }
@@ -90,14 +95,19 @@ submit.addEventListener('click', ()=>{
     else{
         data = document.getElementById('requestJsonText').value;
     }
+    // console.log(url, requestType, contentType); 
     // console.log(data);
+    
 
     if(requestType == 'GET'){
         fetch(url, {
-            method: 'GET'
-        }).then(response=> response.text)
+            method: 'GET',
+        })
+        .then(response=> response.text())
         .then((text) => {
-             document.getElementById('responeJsonText').value = text;
+            // document.getElementById('responseJsonText').value = text;
+            document.getElementById('response-prism').innerHTML = text;
+            Prism.highlightAll();
         });
 
     }
@@ -105,13 +115,27 @@ submit.addEventListener('click', ()=>{
         fetch(url, {
             method: 'POST',
             body: data,
-            header: {
-                "Content-type": "application/json; charset=UTF-8"
-            }
-        }).then(response => response.text)
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8',
+            },
+            })
+            .then(response => response.text())
             .then((text) => {
-                document.getElementById('responeJsonText').value = text;
+                // document.getElementById('responeJsonText').value = text;
+                document.getElementById('response-prism').innerHTML = text;
+                Prism.highlightAll();
             });
     }
 
-})
+ })
+
+
+//  Text shadow 
+
+var text = document.getElementById('text');
+console.log(text.value);
+var shadow = '';
+for (let i = 0; i < 6; i++) {
+    shadow += (shadow ? ',' : '') + i * 1 + 'px ' + i * 1 + 'px 0 rgb(255, 255, 255)';
+}
+text.style.textShadow = shadow;
